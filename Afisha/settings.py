@@ -16,7 +16,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'movie_app',
+    'movie_app'
 ]
 
 MIDDLEWARE = [
@@ -52,8 +52,12 @@ WSGI_APPLICATION = 'Afisha.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'movie_app',
+        'USER': 'postgres',
+        'PASSWORD': 'danceontheants',
+        'HOST': '127.0.0.1',
+        'PORT': '5432'
     }
 }
 

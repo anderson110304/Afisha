@@ -8,7 +8,11 @@ from rest_framework import status
 @api_view(['GET'])
 def director_list_view(request):
     directors = Director.objects.all()
-    data = DirectorSerializer(directors, many=True).data
+    data = []
+    for director in directors:
+        director_data = DirectorSerializer(director).data
+        director_data['movies_count'] = Movie.objects.filter(director=director).count()
+        data.append(director_data)
     return Response(data)
 
 
@@ -17,7 +21,7 @@ def director_detail_view(request, id):
     try:
         director = Director.objects.get(id=id)
     except Director.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND, data={'message': "Режиссера не найден"})
+        return Response(status=status.HTTP_404_NOT_FOUND, data={'message': "Режиссер не найден"})
     data = DirectorSerializer(director).data
     return Response(data=data)
 
@@ -41,9 +45,19 @@ def movie_detail_view(request, id):
 
 @api_view(['GET'])
 def review_list_view(request):
-    reviews = Review.objects.all()
-    data = ReviewSerializer(reviews, many=True).data
-    return Response(data)
+    movies = Movie.objects.all()
+    data = []
+    for movie in movies:
+        movie_data = MovieSerializer(movie).data
+        movie_data['reviews'] = ReviewSerializer(movie.reviews, many=True).data
+        data.append(movie_data)
+
+    # Calculate average rating
+    all_reviews = Review.objects.all()
+    total_stars = sum([int(review.stars) for review in all_reviews])
+    average_rating = total_stars / all_reviews.count() if all_reviews.count() > 0 else 0
+
+    return Response({'movies': data, 'average_rating': average_rating})
 
 
 @api_view(['GET'])
